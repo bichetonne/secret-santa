@@ -36,6 +36,7 @@
 </head>
 <body class="relative overflow-x-hidden flex flex-col items-center justify-center p-4">
 
+    <!-- Flocons de neige -->
     <div class="snowflake" style="left: 10%; animation-duration: 7s; animation-delay: 0s;">❄</div>
     <div class="snowflake" style="left: 30%; animation-duration: 9s; animation-delay: 2s;">❅</div>
     <div class="snowflake" style="left: 50%; animation-duration: 6s; animation-delay: 4s;">❆</div>
@@ -47,21 +48,23 @@
         <div class="text-center mb-8">
             <span class="text-5xl">🎁</span>
             <h1 class="christmas-title text-4xl sm:text-5xl font-bold text-amber-300 mt-2 tracking-wide drop-shadow-md">Secret Santa</h1>
-            <p class="text-emerald-200 text-sm sm:text-base mt-1">Mémoire persistante & Contrainte anti-couples</p>
+            <p class="text-emerald-200 text-sm sm:text-base mt-1">Base de données intégrée & Règle anti-couples</p>
         </div>
 
-        <!-- LISTE FIXE DES PARTICIPANTS -->
+        <!-- LISTE DES PARTICIPANTS ET STATUT DE LA BASE DE DONNEES -->
         <div class="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-800 mb-6">
             <h2 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                <span>👥</span> Participants & Statut des découvertes
+                <span>👥</span> Base de données des participants
             </h2>
-            <div id="participants-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+            <div id="participants-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <!-- Généré dynamiquement par script -->
+            </div>
         </div>
 
-        <!-- ZONE DE CONSULTATION -->
+        <!-- ZONE DE CONSULTATION INDIVIDUELLE -->
         <div class="bg-emerald-950/60 p-6 rounded-2xl border border-emerald-800 text-center space-y-4">
             <h2 class="text-xl font-bold text-amber-300">Découvre ta cible secrète 🎅</h2>
-            <p class="text-sm text-emerald-200">Sélectionne ton prénom. L'application retient définitivement ton choix associé à ta cible.</p>
+            <p class="text-sm text-emerald-200">Sélectionne ton prénom. Le système mémorise définitivement ton choix et valide ton association.</p>
             
             <div class="max-w-xs mx-auto">
                 <select id="selector-name" class="w-full px-4 py-3 bg-emerald-900 border border-emerald-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-400">
@@ -97,9 +100,10 @@
     </div>
 
     <script>
+        // Définition de la base fixe des participants
         const participants = ["Claire", "Stephane", "Sandra", "Corentin", "Eva", "Baptiste", "Téo"];
         
-        // Contraintes de couples (pas de tirage mutuel entre conjoints)
+        // Contraintes de couples (interdiction de piocher son/sa partenaire)
         const couples = {
             "Stephane": "Sandra",
             "Sandra": "Stephane",
@@ -107,21 +111,22 @@
             "Eva": "Corentin",
             "Baptiste": "Claire",
             "Claire": "Baptiste"
+            // Téo n'a pas de partenaire enregistré
         };
 
-        // Base de données locale mémorisant les attributions fixes
-        let assignments = JSON.parse(localStorage.getItem("secret_santa_fixed_assignments")) || {};
-        // Base de données locale mémorisant qui a déjà consulté sa cible
-        let viewedDB = JSON.parse(localStorage.getItem("secret_santa_viewed_db")) || {};
+        // Initialisation de la base de données persistante locale (simulant une table SQLite embarquée)
+        let dbAssignments = JSON.parse(localStorage.getItem("secret_santa_db_assignments")) || {};
+        let dbViewed = JSON.parse(localStorage.getItem("secret_santa_db_viewed")) || {};
 
-        // Génération unique si elle n'existe pas encore
-        if (Object.keys(assignments).length === 0) {
+        // Si le tirage n'a jamais été fait, on l'effectue en respectant les règles d'exclusion
+        if (Object.keys(dbAssignments).length === 0) {
             let targets = [...participants];
             let success = false;
             let attempts = 0;
 
             while (!success && attempts < 5000) {
                 attempts++;
+                // Mélange aléatoire
                 for (let i = targets.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [targets[i], targets[j]] = [targets[j], targets[i]];
@@ -131,6 +136,7 @@
                 for (let i = 0; i < participants.length; i++) {
                     const giver = participants[i];
                     const receiver = targets[i];
+                    // Règle : Pas soi-même et pas son partenaire
                     if (giver === receiver || couples[giver] === receiver) {
                         isValid = false;
                         break;
@@ -143,9 +149,12 @@
 
             if (success) {
                 for (let i = 0; i < participants.length; i++) {
-                    assignments[participants[i]] = targets[i];
+                    dbAssignments[participants[i]] = targets[i];
                 }
-                localStorage.setItem("secret_santa_fixed_assignments", JSON.stringify(assignments));
+                // Sauvegarde définitive dans la "base de données" du navigateur
+                localStorage.setItem("secret_santa_db_assignments", JSON.stringify(dbAssignments));
+            } else {
+                alert("Erreur critique lors de la génération des paires.");
             }
         }
 
@@ -156,20 +165,20 @@
         const modalUserName = document.getElementById("modal-user-name");
         const modalTargetName = document.getElementById("modal-target-name");
 
-        function renderUI() {
+        function renderDatabaseUI() {
             listEl.innerHTML = "";
             selectorName.innerHTML = `<option value="">-- Qui es-tu ? --</option>`;
 
             participants.forEach(p => {
-                const hasViewed = viewedDB[p] === true;
+                const hasViewed = dbViewed[p] === true;
                 
-                // Affichage dans la liste avec statut de consultation
+                // Affichage du statut dans la base de données simulée
                 const tag = document.createElement("div");
                 tag.className = `p-2.5 rounded-xl text-sm font-medium flex items-center justify-between border ${hasViewed ? 'bg-emerald-900/60 border-emerald-600 text-emerald-300' : 'bg-emerald-950/80 border-emerald-800 text-white'}`;
                 tag.innerHTML = `<span>👤 ${p}</span> <span class="text-xs px-2 py-0.5 rounded-full ${hasViewed ? 'bg-emerald-800 text-emerald-200' : 'bg-amber-500/20 text-amber-300'}">${hasViewed ? '✓ A consulté' : 'En attente'}</span>`;
                 listEl.appendChild(tag);
 
-                // Remplir le menu déroulant
+                // Ajout au menu déroulant
                 const opt = document.createElement("option");
                 opt.value = p;
                 opt.textContent = p;
@@ -177,7 +186,7 @@
             });
         }
 
-        renderUI();
+        renderDatabaseUI();
 
         function voirSonDestinataire() {
             const user = selectorName.value;
@@ -186,17 +195,18 @@
                 return;
             }
 
-            const target = assignments[user];
+            const target = dbAssignments[user];
             if(!target) {
-                alert("Erreur de récupération.");
+                alert("Erreur de récupération dans la base de données.");
                 return;
             }
 
-            // Enregistrer dans la base de données que ce participant a consulté sa cible
-            viewedDB[user] = true;
-            localStorage.setItem("secret_santa_viewed_db", JSON.stringify(viewedDB));
-            renderUI();
+            // Enregistrement permanent du statut de consultation
+            dbViewed[user] = true;
+            localStorage.setItem("secret_santa_db_viewed", JSON.stringify(dbViewed));
+            renderDatabaseUI();
 
+            // Affichage de la modale
             modalUserName.textContent = user;
             modalTargetName.textContent = target;
             modal.classList.remove("hidden");
