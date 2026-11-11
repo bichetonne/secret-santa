@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Père Noël Secret - Secret Santa 🎄</title>
+    <title>Père Noël Secret - Agent Mémoire 🎄</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -48,13 +48,13 @@
         <div class="text-center mb-8">
             <span class="text-5xl">🎁</span>
             <h1 class="christmas-title text-4xl sm:text-5xl font-bold text-amber-300 mt-2 tracking-wide drop-shadow-md">Secret Santa</h1>
-            <p class="text-emerald-200 text-sm sm:text-base mt-1">Historique figé à vie & Règle anti-couples</p>
+            <p class="text-emerald-200 text-sm sm:text-base mt-1">Agent Mémoire Persistante & Anti-couples</p>
         </div>
 
-        <!-- LISTE DES PARTICIPANTS ET STATUT VERROUILLE -->
+        <!-- LISTE DES PARTICIPANTS ET MÉMOIRE DE L'AGENT -->
         <div class="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-800 mb-6">
             <h2 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                <span>👥</span> Base de données & Statut des consultations
+                <span>🤖</span> Mémoire de l'Agent & Statuts
             </h2>
             <div id="participants-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <!-- Généré dynamiquement -->
@@ -64,7 +64,7 @@
         <!-- ZONE DE CONSULTATION INDIVIDUELLE -->
         <div class="bg-emerald-950/60 p-6 rounded-2xl border border-emerald-800 text-center space-y-4">
             <h2 class="text-xl font-bold text-amber-300">Découvre ta cible secrète 🎅</h2>
-            <p class="text-sm text-emerald-200">Sélectionne ton prénom. L'attribution est définitivement enregistrée et impossible à modifier.</p>
+            <p class="text-sm text-emerald-200">Sélectionne ton prénom. L'agent mémorise définitivement le tirage et valide ton choix.</p>
             
             <div class="max-w-xs mx-auto">
                 <select id="selector-name" class="w-full px-4 py-3 bg-emerald-900 border border-emerald-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-400">
@@ -100,57 +100,71 @@
     </div>
 
     <script>
-        const participants = ["Claire", "Stephane", "Sandra", "Corentin", "Eva", "Baptiste", "Téo"];
-        
-        // Contraintes de couples strictes
-        const couples = {
-            "Stephane": "Sandra",
-            "Sandra": "Stephane",
-            "Corentin": "Eva",
-            "Eva": "Corentin",
-            "Baptiste": "Claire",
-            "Claire": "Baptiste"
-        };
+        // Simulation de l'Agent Mémoire Web Intégré
+        class AgentMemoireWeb {
+            constructor() {
+                this.participants = ["Claire", "Stephane", "Sandra", "Corentin", "Eva", "Baptiste", "Téo"];
+                this.couples = {
+                    "Stephane": "Sandra",
+                    "Sandra": "Stephane",
+                    "Corentin": "Eva",
+                    "Eva": "Corentin",
+                    "Baptiste": "Claire",
+                    "Claire": "Baptiste"
+                };
+                this.chargerMemoire();
+            }
 
-        // Base de données persistante de l'historique et des statuts
-        let dbAssignments = JSON.parse(localStorage.getItem("secret_santa_archive_assignments")) || {};
-        let dbViewed = JSON.parse(localStorage.getItem("secret_santa_archive_viewed")) || {};
+            chargerMemoire() {
+                this.assignments = JSON.parse(localStorage.getItem("agent_secret_santa_assignments")) || {};
+                this.viewed = JSON.parse(localStorage.getItem("agent_secret_santa_viewed")) || {};
 
-        // Si le tirage n'a jamais été effectué, on le génère une unique fois et on le verrouille à vie
-        if (Object.keys(dbAssignments).length === 0) {
-            let targets = [...participants];
-            let success = false;
-            let attempts = 0;
+                // Si l'agent n'a aucun tirage en mémoire, il le génère une unique fois en respectant les règles
+                if (Object.keys(this.assignments).length === 0) {
+                    let targets = [...this.participants];
+                    let success = false;
+                    let attempts = 0;
 
-            while (!success && attempts < 10000) {
-                attempts++;
-                for (let i = targets.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [targets[i], targets[j]] = [targets[j], targets[i]];
-                }
+                    while (!success && attempts < 10000) {
+                        attempts++;
+                        for (let i = targets.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [targets[i], targets[j]] = [targets[j], targets[i]];
+                        }
 
-                let isValid = true;
-                for (let i = 0; i < participants.length; i++) {
-                    const giver = participants[i];
-                    const receiver = targets[i];
-                    if (giver === receiver || couples[giver] === receiver) {
-                        isValid = false;
-                        break;
+                        let isValid = true;
+                        for (let i = 0; i < this.participants.length; i++) {
+                            const giver = this.participants[i];
+                            const receiver = targets[i];
+                            if (giver === receiver || this.couples[giver] === receiver) {
+                                isValid = false;
+                                break;
+                            }
+                        }
+                        if (isValid) success = true;
+                    }
+
+                    if (success) {
+                        for (let i = 0; i < this.participants.length; i++) {
+                            this.assignments[this.participants[i]] = targets[i];
+                        }
+                        this.sauvegarder();
                     }
                 }
-                if (isValid) {
-                    success = true;
-                }
             }
 
-            if (success) {
-                for (let i = 0; i < participants.length; i++) {
-                    dbAssignments[participants[i]] = targets[i];
-                }
-                // Enregistrement définitif et inchangeable dans la base locale persistante
-                localStorage.setItem("secret_santa_archive_assignments", JSON.stringify(dbAssignments));
+            sauvegarder() {
+                localStorage.setItem("agent_secret_santa_assignments", JSON.stringify(this.assignments));
+                localStorage.setItem("agent_secret_santa_viewed", JSON.stringify(this.viewed));
+            }
+
+            marquerConsulte(user) {
+                this.viewed[user] = true;
+                this.sauvegarder();
             }
         }
+
+        const agent = new AgentMemoireWeb();
 
         const listEl = document.getElementById("participants-list");
         const selectorName = document.getElementById("selector-name");
@@ -163,8 +177,8 @@
             listEl.innerHTML = "";
             selectorName.innerHTML = `<option value="">-- Qui es-tu ? --</option>`;
 
-            participants.forEach(p => {
-                const hasViewed = dbViewed[p] === true;
+            agent.participants.forEach(p => {
+                const hasViewed = agent.viewed[p] === true;
                 
                 const tag = document.createElement("div");
                 tag.className = `p-2.5 rounded-xl text-sm font-medium flex items-center justify-between border ${hasViewed ? 'bg-emerald-900/60 border-emerald-600 text-emerald-300' : 'bg-emerald-950/80 border-emerald-800 text-white'}`;
@@ -187,15 +201,13 @@
                 return;
             }
 
-            const target = dbAssignments[user];
+            const target = agent.assignments[user];
             if(!target) {
                 alert("Erreur de récupération.");
                 return;
             }
 
-            // Mémorise à vie que cette personne a découvert sa cible
-            dbViewed[user] = true;
-            localStorage.setItem("secret_santa_archive_viewed", JSON.stringify(dbViewed));
+            agent.marquerConsulte(user);
             renderUI();
 
             modalUserName.textContent = user;
