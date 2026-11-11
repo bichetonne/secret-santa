@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Père Noël Secret - Secret Santa 🎄</title>
-    <!-- Tailwind CSS pour un design moderne et responsive -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -17,7 +16,6 @@
         .christmas-title {
             font-family: 'Mountains of Christmas', cursive;
         }
-        /* Effet de neige simple */
         .snowflake {
             color: #ffffff;
             font-size: 1em;
@@ -38,73 +36,44 @@
 </head>
 <body class="relative overflow-x-hidden flex flex-col items-center justify-center p-4">
 
-    <!-- Flocons de neige décoratifs -->
     <div class="snowflake" style="left: 10%; animation-duration: 7s; animation-delay: 0s;">❄</div>
     <div class="snowflake" style="left: 30%; animation-duration: 9s; animation-delay: 2s;">❅</div>
     <div class="snowflake" style="left: 50%; animation-duration: 6s; animation-delay: 4s;">❆</div>
     <div class="snowflake" style="left: 70%; animation-duration: 8s; animation-delay: 1s;">❄</div>
     <div class="snowflake" style="left: 90%; animation-duration: 10s; animation-delay: 3s;">❅</div>
 
-    <div class="w-full max-w-xl bg-emerald-900/80 backdrop-blur-md border border-emerald-700/50 rounded-3xl shadow-2xl p-6 sm:p-8 relative z-10 my-8">
+    <div class="w-full max-w-xl bg-emerald-900/85 backdrop-blur-md border border-emerald-700/50 rounded-3xl shadow-2xl p-6 sm:p-8 relative z-10 my-8">
         
-        <!-- En-Tête -->
         <div class="text-center mb-8">
             <span class="text-5xl">🎁</span>
             <h1 class="christmas-title text-4xl sm:text-5xl font-bold text-amber-300 mt-2 tracking-wide drop-shadow-md">Secret Santa</h1>
-            <p class="text-emerald-200 text-sm sm:text-base mt-1">Tirage au sort magique de Noël</p>
+            <p class="text-emerald-200 text-sm sm:text-base mt-1">Base de données figée - Tirage unique sécurisé</p>
         </div>
 
-        <!-- SECTION 1 : CONFIGURATION DES PARTICIPANTS -->
-        <div id="setup-section" class="space-y-6">
-            <div class="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-800">
-                <h2 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                    <span>👥</span> Liste des participants
-                </h2>
-                
-                <!-- Formulaire d'ajout -->
-                <form id="add-form" class="flex gap-2 mb-4">
-                    <input type="text" id="participant-input" placeholder="Prénom du participant..." 
-                        class="flex-1 px-4 py-3 bg-emerald-900/90 border border-emerald-700 rounded-xl text-white placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-amber-400">
-                    <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-emerald-950 font-bold px-5 py-3 rounded-xl transition shadow-lg cursor-pointer">
-                        Ajouter
-                    </button>
-                </form>
+        <!-- LISTE FIXE DES PARTICIPANTS -->
+        <div class="bg-emerald-950/60 p-4 rounded-2xl border border-emerald-800 mb-6">
+            <h2 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                <span>👥</span> Participants enregistrés (Fixe)
+            </h2>
+            <div id="participants-list" class="flex flex-wrap gap-2">
+                <!-- Généré par JS -->
+            </div>
+        </div>
 
-                <!-- Liste des puces -->
-                <div id="participants-list" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1">
-                    <!-- Généré par JS -->
-                </div>
+        <!-- ZONE DE CONSULTATION -->
+        <div class="bg-emerald-950/60 p-6 rounded-2xl border border-emerald-800 text-center space-y-4">
+            <h2 class="text-xl font-bold text-amber-300">Découvre ta cible secrète 🎅</h2>
+            <p class="text-sm text-emerald-200">Sélectionne ton prénom. Le système empêche tout doublon et garantit un tirage unique.</p>
+            
+            <div class="max-w-xs mx-auto">
+                <select id="selector-name" class="w-full px-4 py-3 bg-emerald-900 border border-emerald-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <option value="">-- Qui es-tu ? --</option>
+                </select>
             </div>
 
-            <button id="start-draw-btn" onclick="lancerTirage()" class="w-full py-4 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold rounded-2xl shadow-xl transition transform hover:scale-[1.01] text-lg flex items-center justify-center gap-2 cursor-pointer">
-                <span>✨ Lancer le tirage au sort magique</span>
+            <button onclick="voirSonDestinataire()" class="w-full max-w-xs mx-auto block py-3 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-bold rounded-xl transition shadow-lg cursor-pointer">
+                🎁 Découvrir ma cible
             </button>
-        </div>
-
-        <!-- SECTION 2 : CONSULTATION INDIVIDUELLE -->
-        <div id="consult-section" class="hidden space-y-6">
-            <div class="bg-emerald-950/60 p-6 rounded-2xl border border-emerald-800 text-center space-y-4">
-                <h2 class="text-xl font-bold text-amber-300">C'est l'heure de découvrir ton cadeau ! 🎅</h2>
-                <p class="text-sm text-emerald-200">Choisis ton prénom dans la liste ci-dessous pour révéler secrètement qui tu dois gâter.</p>
-                
-                <div class="max-w-xs mx-auto">
-                    <select id="selector-name" class="w-full px-4 py-3 bg-emerald-900 border border-emerald-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-400">
-                        <option value="">-- Qui es-tu ? --</option>
-                    </select>
-                </div>
-
-                <button onclick="voirSonDestinataire()" class="w-full max-w-xs mx-auto block py-3 bg-amber-500 hover:bg-amber-400 text-emerald-950 font-bold rounded-xl transition shadow-lg cursor-pointer">
-                    🎁 Découvrir ma cible secrète
-                </button>
-            </div>
-
-            <!-- Boutons de réinitialisation / organisateur -->
-            <div class="flex justify-between items-center pt-4 border-t border-emerald-800">
-                <button onclick="resetApp()" class="text-xs text-rose-300 hover:text-rose-200 underline cursor-pointer">
-                    🔄 Recommencer à zéro
-                </button>
-                <span class="text-xs text-emerald-400 font-medium">Tirage sécurisé validé ✅</span>
-            </div>
         </div>
 
     </div>
@@ -130,81 +99,25 @@
     </div>
 
     <script>
-        // Liste initiale configurée
-        let participants = ["Claire", "Stephane", "Sandra", "Corentin", "Eva", "Baptiste", "Téo"];
-        let assignments = {}; // Stocke les paires { "Participant": "Cible" }
-
-        const inputEl = document.getElementById("participant-input");
-        const formEl = document.getElementById("add-form");
-        const listEl = document.getElementById("participants-list");
-        const setupSection = document.getElementById("setup-section");
-        const consultSection = document.getElementById("consult-section");
-        const selectorName = document.getElementById("selector-name");
+        // Base de données fixe et immuable des participants
+        const participants = ["Claire", "Stephane", "Sandra", "Corentin", "Eva", "Baptiste", "Téo"];
         
-        const modal = document.getElementById("reveal-modal");
-        const modalContent = document.getElementById("modal-content");
-        const modalUserName = document.getElementById("modal-user-name");
-        const modalTargetName = document.getElementById("modal-target-name");
+        // Algorithme déterministe/sécurisé d'attribution unique (aucun doublon, pas d'auto-attribution)
+        // Les paires sont stockées et mémorisées dans le localStorage du navigateur pour rester fixes.
+        let assignments = JSON.parse(localStorage.getItem("secret_santa_db")) || {};
 
-        // Affichage initial de la liste au chargement de la page
-        renderParticipants();
-
-        formEl.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const name = inputEl.value.trim();
-            if(!name) return;
-            
-            // Éviter les doublons insensibles à la casse
-            if(participants.map(p => p.toLowerCase()).includes(name.toLowerCase())) {
-                alert("Ce prénom est déjà dans la liste !");
-                return;
-            }
-
-            participants.push(name);
-            inputEl.value = "";
-            renderParticipants();
-        });
-
-        function removeParticipant(index) {
-            participants.splice(index, 1);
-            renderParticipants();
-        }
-
-        function renderParticipants() {
-            listEl.innerHTML = "";
-            if(participants.length === 0) {
-                listEl.innerHTML = `<p class="text-emerald-400 text-sm italic w-full text-center py-2">Aucun participant pour l'instant.</p>`;
-                return;
-            }
-            participants.forEach((p, idx) => {
-                const tag = document.createElement("div");
-                tag.className = "bg-emerald-800/90 border border-emerald-600 text-white px-3 py-1.5 rounded-xl text-sm flex items-center gap-2 shadow-sm";
-                tag.innerHTML = `<span>${p}</span> <button type="button" onclick="removeParticipant(${idx})" class="text-emerald-400 hover:text-rose-300 font-bold ml-1 cursor-pointer">×</button>`;
-                listEl.appendChild(tag);
-            });
-        }
-
-        // Algorithme de tirage au sort (Dérangement sans auto-attribution)
-        function lancerTirage() {
-            if(participants.length < 3) {
-                alert("Il faut au moins 3 participants pour organiser un Secret Santa !");
-                return;
-            }
-
+        if (Object.keys(assignments).length === 0) {
             let targets = [...participants];
             let success = false;
             let attempts = 0;
 
-            // Boucle pour garantir qu'aucun participant ne pioche son propre nom
             while (!success && attempts < 1000) {
                 attempts++;
-                // Mélange aléatoire de Fisher-Yates
                 for (let i = targets.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [targets[i], targets[j]] = [targets[j], targets[i]];
                 }
 
-                // Vérification qu'aucun ne tombe sur lui-même
                 let hasSelf = false;
                 for (let i = 0; i < participants.length; i++) {
                     if (participants[i] === targets[i]) {
@@ -217,30 +130,34 @@
                 }
             }
 
-            if (!success) {
-                alert("Le tirage n'a pas pu s'effectuer correctement. Réessayez !");
-                return;
+            if (success) {
+                for (let i = 0; i < participants.length; i++) {
+                    assignments[participants[i]] = targets[i];
+                }
+                localStorage.setItem("secret_santa_db", JSON.stringify(assignments));
             }
-
-            // Enregistrement des paires
-            assignments = {};
-            for (let i = 0; i < participants.length; i++) {
-                assignments[participants[i]] = targets[i];
-            }
-
-            // Basculer vers l'interface de consultation individuelle
-            setupSection.classList.add("hidden");
-            consultSection.classList.remove("hidden");
-
-            // Remplir le menu déroulant
-            selectorName.innerHTML = `<option value="">-- Qui es-tu ? --</option>`;
-            participants.forEach(p => {
-                const opt = document.createElement("option");
-                opt.value = p;
-                opt.textContent = p;
-                selectorName.appendChild(opt);
-            });
         }
+
+        const listEl = document.getElementById("participants-list");
+        const selectorName = document.getElementById("selector-name");
+        const modal = document.getElementById("reveal-modal");
+        const modalContent = document.getElementById("modal-content");
+        const modalUserName = document.getElementById("modal-user-name");
+        const modalTargetName = document.getElementById("modal-target-name");
+
+        // Affichage des participants fixes
+        participants.forEach(p => {
+            const tag = document.createElement("div");
+            tag.className = "bg-emerald-800/90 border border-emerald-600 text-white px-3 py-1.5 rounded-xl text-sm font-medium shadow-sm";
+            tag.textContent = p;
+            listEl.appendChild(tag);
+
+            // Remplir la liste déroulante
+            const opt = document.createElement("option");
+            opt.value = p;
+            opt.textContent = p;
+            selectorName.appendChild(opt);
+        });
 
         function voirSonDestinataire() {
             const user = selectorName.value;
@@ -255,7 +172,6 @@
                 return;
             }
 
-            // Afficher la modale avec animation
             modalUserName.textContent = user;
             modalTargetName.textContent = target;
             modal.classList.remove("hidden");
@@ -266,23 +182,12 @@
         }
 
         function fermerModale() {
-            // Effet de fermeture
             modalContent.classList.remove("scale-100", "opacity-100");
             modalContent.classList.add("scale-95", "opacity-0");
             setTimeout(() => {
                 modal.classList.add("hidden");
-                selectorName.value = ""; // Réinitialiser le select pour le suivant
-            }, 150);
-        }
-
-        function resetApp() {
-            if(confirm("Voulez-vous vraiment tout recommencer et effacer le tirage en cours ?")) {
-                assignments = {};
-                consultSection.classList.add("hidden");
-                setupSection.classList.remove("hidden");
                 selectorName.value = "";
-                renderParticipants();
-            }
+            }, 150);
         }
     </script>
 </body>
